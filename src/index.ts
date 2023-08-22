@@ -1,9 +1,3 @@
-export { African_tree } from './icons/African_tree';
-export { Agile } from './icons/Agile';
-export { Air_conditioner } from './icons/Air_conditioner';
-export { Airplane } from './icons/Airplane';
-export { Airplay } from './icons/Airplay';
-export { Alarm } from './icons/Alarm';
 export { Icon_1st_medal } from './icons/Icon_1st_medal';
 export { Icon_2x2_cell } from './icons/Icon_2x2_cell';
 export { Icon_360_view } from './icons/Icon_360_view';

@@ -4,6 +4,7 @@
 SVG_FOLDER="./icons"
 
 echo "Searching for SVG files in folder $SVG_FOLDER..."
+rm -f "./src/index.ts"
 
 # Iterate through SVG files in directory
 for svgFile in $SVG_FOLDER/*.svg; do
