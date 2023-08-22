@@ -37,24 +37,24 @@ export default App
 and Icons componente
 
 ```
-import  {  useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface IconsProps {
-  iconFunction: (strokeWidth: string, stroke: string, fill: string) => SVGElement;
+  iconFunction: (props: { strokeWidth: string; stroke: string; fill: string }) => SVGElement;
   strokeWidth: string;
   stroke: string;
   fill: string;
 }
 
-function Icons({ iconFunction, strokeWidth='1.5', stroke='currentColor', fill='none' }: IconsProps) {
-  const svgRef = useRef<SVGSVGElement>(null);
+function Icons({ iconFunction, strokeWidth = '1.5', stroke = 'currentColor', fill = 'none' }: IconsProps) {
+  const svgRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     dinamicImport();
   }, []);
 
   function dinamicImport() {
-    const svgElement = iconFunction(strokeWidth, stroke, fill);
+    const svgElement = iconFunction({ strokeWidth, stroke, fill });
 
     if (svgRef.current) {
       svgRef.current.innerHTML = ''; // Limpiar el contenido existente
@@ -62,11 +62,7 @@ function Icons({ iconFunction, strokeWidth='1.5', stroke='currentColor', fill='n
     }
   }
 
-  return (
-    <div>
-      <svg ref={svgRef} />
-    </div>
-  );
+  return <div ref={svgRef} />;
 }
 
 export default Icons;
