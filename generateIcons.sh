@@ -3,6 +3,12 @@
 # Directory containing SVG files
 SVG_FOLDER="./icons"
 
+echo "Deleting existing icons folder..."
+rm -rf "./src/icons"
+
+echo "Creating icons folder..."
+mkdir -p "./src/icons"
+
 echo "Searching for SVG files in folder $SVG_FOLDER..."
 rm -f "./src/index.ts"
 
@@ -32,29 +38,39 @@ for svgFile in $SVG_FOLDER/*.svg; do
   tsFileName="./src/icons/${baseName}.ts"
 
   echo "Generating TypeScript file for SVG file $svgFile..."
-
-  # TypeScript file content
-  tsContent="function ${baseName} ({strokeWidth='1.5', stroke='currentColor', fill='none'}:{strokeWidth:string, stroke:string, fill:string}) {
+# TypeScript file content
+tsContent="function ${baseName} ({size='16', strokeWidth='1.5', stroke='currentColor', fill='none'}:{size:'16' | '24' | '32', strokeWidth:string, stroke:string, fill:string}) {
   const svgContent = \`$(cat "$svgFile")\`;
 
-
- const parser = new DOMParser();
+  const parser = new DOMParser();
   const svgDocument = parser.parseFromString(svgContent, 'image/svg+xml');
   const svgElement = svgDocument.documentElement;
 
   if (svgElement instanceof SVGElement) {
-    svgElement.setAttribute('stroke-width', strokeWidth);
-    svgElement.setAttribute('stroke', stroke);
+    // Set size attribute on the <svg> element
+    const sizePx = size === '16' ? '16' : size === '24' ? '24' : '32';
+    svgElement.setAttribute('width', sizePx);
+    svgElement.setAttribute('height', sizePx);
+
+    // Set fill attribute on the <svg> element
     svgElement.setAttribute('fill', fill);
+
+    // Set stroke attribute on all path elements
+    const pathElements = svgElement.querySelectorAll('path');
+    for (let i = 0; i < pathElements.length; i++) {
+      const pathElement = pathElements[i];
+      pathElement.setAttribute('stroke-width', strokeWidth);
+      pathElement.setAttribute('stroke', stroke);
+    }
+
     return svgElement;
   }
 
   throw new Error('Failed to create SVG element.');
 };
 
-export {  ${baseName} };
+export { ${baseName} };
 "
-
   # Create TypeScript file
   echo "$tsContent" > "$tsFileName"
 

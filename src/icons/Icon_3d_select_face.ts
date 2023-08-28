@@ -1,4 +1,4 @@
-function Icon_3d_select_face ({strokeWidth='1.5', stroke='currentColor', fill='none'}:{strokeWidth:string, stroke:string, fill:string}) {
+function Icon_3d_select_face ({size='16', strokeWidth='1.5', stroke='currentColor', fill='none'}:{size:'16' | '24' | '32', strokeWidth:string, stroke:string, fill:string}) {
   const svgContent = `<svg width="24" height="24" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M21 7.35304L21 16.647C21 16.8649 20.8819 17.0656 20.6914 17.1715L12.2914 21.8381C12.1102 21.9388 11.8898 21.9388 11.7086 21.8381L3.30861 17.1715C3.11814 17.0656 3 16.8649 3 16.647L2.99998 7.35304C2.99998 7.13514 3.11812 6.93437 3.3086 6.82855L11.7086 2.16188C11.8898 2.06121 12.1102 2.06121 12.2914 2.16188L20.6914 6.82855C20.8818 6.93437 21 7.13514 21 7.35304Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M3.52844 7.29357L11.7086 11.8381C11.8898 11.9388 12.1102 11.9388 12.2914 11.8381L20.5 7.27777" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
@@ -6,20 +6,32 @@ function Icon_3d_select_face ({strokeWidth='1.5', stroke='currentColor', fill='n
 <path d="M11.6914 11.8285L3.89139 7.49521C3.49147 7.27304 3 7.56222 3 8.01971V16.647C3 16.8649 3.11813 17.0656 3.30861 17.1715L11.1086 21.5048C11.5085 21.727 12 21.4378 12 20.9803V12.353C12 12.1351 11.8819 11.9344 11.6914 11.8285Z" fill="currentColor" stroke="currentColor" stroke-linejoin="round"/>
 </svg>`;
 
-
- const parser = new DOMParser();
+  const parser = new DOMParser();
   const svgDocument = parser.parseFromString(svgContent, 'image/svg+xml');
   const svgElement = svgDocument.documentElement;
 
   if (svgElement instanceof SVGElement) {
-    svgElement.setAttribute('stroke-width', strokeWidth);
-    svgElement.setAttribute('stroke', stroke);
+    // Set size attribute on the <svg> element
+    const sizePx = size === '16' ? '16' : size === '24' ? '24' : '32';
+    svgElement.setAttribute('width', sizePx);
+    svgElement.setAttribute('height', sizePx);
+
+    // Set fill attribute on the <svg> element
     svgElement.setAttribute('fill', fill);
+
+    // Set stroke attribute on all path elements
+    const pathElements = svgElement.querySelectorAll('path');
+    for (let i = 0; i < pathElements.length; i++) {
+      const pathElement = pathElements[i];
+      pathElement.setAttribute('stroke-width', strokeWidth);
+      pathElement.setAttribute('stroke', stroke);
+    }
+
     return svgElement;
   }
 
   throw new Error('Failed to create SVG element.');
 };
 
-export {  Icon_3d_select_face };
+export { Icon_3d_select_face };
 

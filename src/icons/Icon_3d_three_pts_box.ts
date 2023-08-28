@@ -1,4 +1,4 @@
-function Icon_3d_three_pts_box ({strokeWidth='1.5', stroke='currentColor', fill='none'}:{strokeWidth:string, stroke:string, fill:string}) {
+function Icon_3d_three_pts_box ({size='16', strokeWidth='1.5', stroke='currentColor', fill='none'}:{size:'16' | '24' | '32', strokeWidth:string, stroke:string, fill:string}) {
   const svgContent = `<svg width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M12 23C12.5523 23 13 22.5523 13 22C13 21.4477 12.5523 21 12 21C11.4477 21 11 21.4477 11 22C11 22.5523 11.4477 23 12 23Z" fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M3 8C3.55228 8 4 7.55228 4 7C4 6.44772 3.55228 6 3 6C2.44772 6 2 6.44772 2 7C2 7.55228 2.44772 8 3 8Z" fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
@@ -8,20 +8,32 @@ function Icon_3d_three_pts_box ({strokeWidth='1.5', stroke='currentColor', fill=
 <path d="M12 21L12 12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`;
 
-
- const parser = new DOMParser();
+  const parser = new DOMParser();
   const svgDocument = parser.parseFromString(svgContent, 'image/svg+xml');
   const svgElement = svgDocument.documentElement;
 
   if (svgElement instanceof SVGElement) {
-    svgElement.setAttribute('stroke-width', strokeWidth);
-    svgElement.setAttribute('stroke', stroke);
+    // Set size attribute on the <svg> element
+    const sizePx = size === '16' ? '16' : size === '24' ? '24' : '32';
+    svgElement.setAttribute('width', sizePx);
+    svgElement.setAttribute('height', sizePx);
+
+    // Set fill attribute on the <svg> element
     svgElement.setAttribute('fill', fill);
+
+    // Set stroke attribute on all path elements
+    const pathElements = svgElement.querySelectorAll('path');
+    for (let i = 0; i < pathElements.length; i++) {
+      const pathElement = pathElements[i];
+      pathElement.setAttribute('stroke-width', strokeWidth);
+      pathElement.setAttribute('stroke', stroke);
+    }
+
     return svgElement;
   }
 
   throw new Error('Failed to create SVG element.');
 };
 
-export {  Icon_3d_three_pts_box };
+export { Icon_3d_three_pts_box };
 

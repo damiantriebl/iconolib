@@ -1,4 +1,4 @@
-function Icon_3d_ellipse_three_pts ({strokeWidth='1.5', stroke='currentColor', fill='none'}:{strokeWidth:string, stroke:string, fill:string}) {
+function Icon_3d_ellipse_three_pts ({size='16', strokeWidth='1.5', stroke='currentColor', fill='none'}:{size:'16' | '24' | '32', strokeWidth:string, stroke:string, fill:string}) {
   const svgContent = `<svg width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M5 3C5.55228 3 6 2.55228 6 2C6 1.44772 5.55228 1 5 1C4.44772 1 4 1.44772 4 2C4 2.55228 4.44772 3 5 3Z" fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M5 22H13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
@@ -9,20 +9,32 @@ function Icon_3d_ellipse_three_pts ({strokeWidth='1.5', stroke='currentColor', f
 <path d="M13 23C13.5523 23 14 22.5523 14 22C14 21.4477 13.5523 21 13 21C12.4477 21 12 21.4477 12 22C12 22.5523 12.4477 23 13 23Z" fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`;
 
-
- const parser = new DOMParser();
+  const parser = new DOMParser();
   const svgDocument = parser.parseFromString(svgContent, 'image/svg+xml');
   const svgElement = svgDocument.documentElement;
 
   if (svgElement instanceof SVGElement) {
-    svgElement.setAttribute('stroke-width', strokeWidth);
-    svgElement.setAttribute('stroke', stroke);
+    // Set size attribute on the <svg> element
+    const sizePx = size === '16' ? '16' : size === '24' ? '24' : '32';
+    svgElement.setAttribute('width', sizePx);
+    svgElement.setAttribute('height', sizePx);
+
+    // Set fill attribute on the <svg> element
     svgElement.setAttribute('fill', fill);
+
+    // Set stroke attribute on all path elements
+    const pathElements = svgElement.querySelectorAll('path');
+    for (let i = 0; i < pathElements.length; i++) {
+      const pathElement = pathElements[i];
+      pathElement.setAttribute('stroke-width', strokeWidth);
+      pathElement.setAttribute('stroke', stroke);
+    }
+
     return svgElement;
   }
 
   throw new Error('Failed to create SVG element.');
 };
 
-export {  Icon_3d_ellipse_three_pts };
+export { Icon_3d_ellipse_three_pts };
 
