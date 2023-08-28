@@ -12,8 +12,8 @@ mkdir -p "./src/icons"
 echo "Searching for SVG files in folder $SVG_FOLDER..."
 rm -f "./src/index.ts"
 
-# Iterate through SVG files in directory
-for svgFile in $SVG_FOLDER/*.svg; do
+# Iterate through SVG files in directory and subdirectories
+find "$SVG_FOLDER" -type f -name "*.svg" | while read svgFile; do
   # Get base name of file without extension
   baseName=$(basename "$svgFile" .svg)
 
@@ -34,12 +34,20 @@ for svgFile in $SVG_FOLDER/*.svg; do
   # Convert first character of baseName to uppercase
   baseName="$(tr '[:lower:]' '[:upper:]' <<< ${baseName:0:1})${baseName:1}"
 
+  # Get subdirectory path relative to SVG_FOLDER
+  subDir=$(dirname "${svgFile#$SVG_FOLDER/}")
+
+  # Create subdirectory in ./src/icons if it doesn't exist
+  if [[ -n "$subDir" && ! -d "./src/icons/$subDir" ]]; then
+    mkdir -p "./src/icons/$subDir"
+  fi
+
   # TypeScript file name to generate
-  tsFileName="./src/icons/${baseName}.ts"
+  tsFileName="./src/icons/$subDir/${baseName}.ts"
 
   echo "Generating TypeScript file for SVG file $svgFile..."
-# TypeScript file content
-tsContent="function ${baseName} ({size='16', strokeWidth='1.5', stroke='currentColor', fill='none'}:{size:'16' | '24' | '32', strokeWidth:string, stroke:string, fill:string}) {
+  # TypeScript file content
+  tsContent="function ${baseName} ({size='16', strokeWidth='1.5', stroke='currentColor', fill='none'}:{size:'16' | '24' | '32', strokeWidth:string, stroke:string, fill:string}) {
   const svgContent = \`$(cat "$svgFile")\`;
 
   const parser = new DOMParser();
@@ -77,7 +85,7 @@ export { ${baseName} };
   echo "File $tsFileName generated."
 
   # Add export statement to index.ts
-  echo "export { ${baseName} } from './icons/${baseName}';" >> "./src/index.ts"
+  echo "export { ${baseName} } from './icons/${subDir}/${baseName}';" >> "./src/index.ts"
 done
 
 echo "TypeScript file generation process completed."
