@@ -19,42 +19,122 @@ You can link to test in a very simple way, using ```npm link``` and in the proje
 in any component
 
 ```
+import { useEffect, useState } from 'react';
 import Icons from './component/icons';
-import { Agile } from 'iconolib'; // Ajusta la ruta según tu estructura de carpetas
+import { Agile, Airplane,  Add_user, Add_page_alt, Ey  } from 'iconolib'; // Ajusta la ruta según tu estructura de carpetas
+
+
+interface IconState {
+  stroke: string;
+  strokeWidth: string;
+  fill: string;
+  size: "16" | "24" | "32";
+}
+
+interface IconProps extends IconState{
+  iconFunction: (props: IconState) => SVGElement; 
+}
 
 function App() {
+  const [defaultIconProps, setDefaultIconProps] = useState<IconProps[]>([
+    { iconFunction: Agile, strokeWidth: '1.5', stroke: 'white', fill: 'none', size: '' },
+    { iconFunction: Airplane, strokeWidth: '1.5', stroke: 'white', fill: 'none', size: '32' },
+    { iconFunction: Add_user, strokeWidth: '1.5', stroke: 'white', fill: 'none', size: '32' },
+    { iconFunction: Add_page_alt, strokeWidth: '1.5', stroke: 'white', fill: 'none', size: '32' },
+    { iconFunction: Ey, strokeWidth: '1.5', stroke: 'none', fill: 'none', size: '32' },
+  ]);
+
+  const [iconProps, setIconProps] = useState<IconProps[]>(defaultIconProps);
+  const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if (!isPaused) {
+        setIconProps((prevIconProps) =>
+          prevIconProps.map((iconProps) => ({
+            ...iconProps,
+            stroke: ramdomColor(),
+            strokeWidth: ramdomStokeWidth(),
+            fill: ramdomColor(),
+            size: randomSize(),
+          }))
+        );
+      }
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [isPaused]);
+
+  function ramdomStokeWidth(): string {
+    const randomStrokeWidth = Math.random() * (4 - 0.5) + 0.5;
+    return randomStrokeWidth.toString();
+  }
+
+  function ramdomColor(): string {
+    const colors = ['red', 'blue', 'none', 'yellow', 'purple', 'orange'];
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    return randomColor;
+  }
+
+  function randomSize(): "16" | "24" | "32" {
+    const sizes = ['16', '24', '32'];
+    const randomSize = sizes[Math.floor(Math.random() * sizes.length)];
+    return randomSize as "16" | "24" | "32";
+  }
+
+  function resetIconProps() {
+    setIsPaused(true);
+    setIconProps(defaultIconProps);
+  }
+
+  function toggleInterval() {
+    setIsPaused((prevIsPaused) => !prevIsPaused);
+  }
 
   return (
     <>
-        <Icons iconFunction={Agile} fill='red' stroke='blue' strokeWidth='4' />
+      <div style={{ display: 'flex' }}>
+        {iconProps.map((iconProps, index) => (
+          <Icons key={index} {...iconProps} />
+        ))}
+      </div>
+      <button onClick={resetIconProps}>
+        reset
+      </button>
+      <button onClick={toggleInterval}>
+        {isPaused ? 'resume' : 'pause'}
+      </button>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
 ```
 
 and Icons componente
 
-```
-import { useEffect, useRef } from 'react';
+```import { useEffect, useRef } from 'react';
 
-interface IconsProps {
-  iconFunction: (props: { strokeWidth: string; stroke: string; fill: string }) => SVGElement;
+
+interface IconFunctionProps {
+  size: "16" | "24" | "32";
   strokeWidth: string;
   stroke: string;
   fill: string;
 }
 
-function Icons({ iconFunction, strokeWidth = '1.5', stroke = 'currentColor', fill = 'none' }: IconsProps) {
+interface IconsProps extends IconFunctionProps {
+  iconFunction: (props: IconFunctionProps) => SVGElement;
+}
+function Icons({size="16", iconFunction, strokeWidth = '1.5', stroke = 'currentColor', fill = 'none' }: IconsProps) {
   const svgRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    dinamicImport();
-  }, []);
+    createSvg();
+  }, [stroke]);
 
-  function dinamicImport() {
-    const svgElement = iconFunction({ strokeWidth, stroke, fill });
+  function createSvg() {
+    const svgElement = iconFunction({size, strokeWidth, stroke, fill });
 
     if (svgRef.current) {
       svgRef.current.innerHTML = ''; // Limpiar el contenido existente
